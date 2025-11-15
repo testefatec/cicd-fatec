@@ -9,6 +9,15 @@ on:
   pull_request:
     branches: [ main ]
 
+# Permissões necessárias para o CodeQL fazer upload dos resultados e acessar a API
+# - contents: read — permite ler o conteúdo do repositório
+# - security-events: write — permite fazer upload de resultados do Code scanning
+# - security-events: read — permite ler status de alertas anteriores
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
 jobs:
   # 1) Security: roda o CodeQL para analisar vulnerabilidades.
   security:
@@ -27,13 +36,18 @@ jobs:
           languages: python
 
       # Executa a análise do CodeQL
+      # Nota: A ação `analyze@v3` não suporta `fail-on` diretamente.
+      # As vulnerabilidades são reportadas em "Security" → "Code scanning alerts".
+      # Você pode criar uma rule no GitHub para bloquear merges se houver alertas críticos.
       - name: Perform CodeQL analysis
         uses: github/codeql-action/analyze@v3
         with:
-          # Se o CodeQL encontrar problemas de severidade >= medium,
-          # a step (e por consequência o job) falhará.
-          # Troque para 'high' se quiser apenas falhar em issues críticas.
-          fail-on: medium
+          # Opções disponíveis em v3:
+          # - checkout_path: caminho do repositório
+          # - ref: referência específica
+          # - sha: commit específico
+          # Para mais detalhes, veja: https://github.com/github/codeql-action
+          category: python-security
 
   # 2) Testes e lint: roda lint (flake8) e testes (pytest).
   # Este job pode rodar em paralelo ao security, mas mantemos separado

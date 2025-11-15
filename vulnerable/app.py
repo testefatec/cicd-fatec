@@ -4,7 +4,7 @@ Exemplos intencionalmente vulneráveis para fins didáticos.
 AVISO: Este código é inseguro por design. Não use em produção.
 
 Objetivo: demonstrar vulnerabilidades simples que o CodeQL deve detectar
- (ex.: uso de `eval` com entrada do usuário).
+ (ex.: uso de `eval` com entrada do usuário)..
 """
 
 def insecure_eval(user_input: str):

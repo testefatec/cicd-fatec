@@ -10,9 +10,9 @@ fornecer um pipeline curto, comentado e fácil de entender para uso em sala de a
 
 **Visão rápida**:
 - Ao enviar um push ou abrir uma pull request para `main`, a workflow dispara.
-- O CodeQL roda e, se encontrar vulnerabilidades de severidade >= *medium*, a
-	pipeline falha e gera alertas.
-- Se CodeQL e os testes/lint passarem, o job de *deploy-stage* será executado.
+- O CodeQL roda e gera alertas de segurança (visíveis em `Security` → `Code scanning alerts`).
+- Os alertas podem ser integrados com regras de branch protection para bloquear merges.
+- Se CodeQL, testes/lint e demais verificações passarem, o job de *deploy-stage* é executado.
 
 **Como usar (rápido)**:
 1. Abra o repositório no GitHub.
@@ -28,24 +28,29 @@ fornecer um pipeline curto, comentado e fácil de entender para uso em sala de a
 	 usar SCP). NÃO é necessário quando você usa o `Environment` do GitHub.
 
 **Onde editar a regra de falha do CodeQL**:
-- No arquivo `/.github/workflows/ci-cd-python.yml`, a opção `fail-on` está
-	configurada como `medium`. Para falhar apenas em issues críticas, troque para
-	`high`.
+- A partir da versão 3 da ação CodeQL, o parâmetro `fail-on` foi removido.
+- Em vez disso, as vulnerabilidades são reportadas como **Code scanning alerts** no GitHub.
+- Para **bloquear merges** automaticamente quando há vulnerabilidades:
+  1. Vá em `Settings` → `Branches` → `Add rule` para a branch `main`.
+  2. Em `Require status checks to pass before merging`, ative `Code scanning — CodeQL`.
+  3. Selecione o nível de severidade desejado (medium, high, critical).
+
+Desta forma, a pipeline não "falha" diretamente, mas o GitHub bloqueia o merge se houver alertas.
 
 **Diagrama da arquitetura da pipeline**: (removido a pedido do professor)
 
 **Explicação dos estágios (didático)**:
 - **Security (CodeQL)**: utiliza a Action oficial `github/codeql-action` para
-	analisar o código em busca de vulnerabilidades. A entrada `fail-on` determina a
-	severidade mínima que fará a pipeline falhar (ex.: `medium`). Se falhar, o
-	job termina com erro e o deploy NÃO é executado.
+	analisar o código em busca de vulnerabilidades. Os alertas são reportados em
+	`Security` → `Code scanning alerts`. A categoria é `python-security` para
+	análise específica de Python. Permissões (`security-events: write`) são
+	necessárias para que o CodeQL faça upload dos resultados.
 - **Lint and Test**: instala dependências (se houver `requirements.txt`),
 	instala ferramentas de desenvolvimento (`flake8`, `pytest`) e executa lint e
-	testes unitários. Erros aqui também fazem a pipeline falhar.
-- **Deploy to Stage**: exemplo educativo; só roda se os dois jobs anteriores
-	forem bem-sucedidos. No exemplo este passo apenas cria um artefato e imprime
-	instruções. Substitua por uma action de deploy real (SCP, rsync, S3, container
-push, etc.) e use secrets para credenciais.
+	testes unitários. Erros aqui fazem a pipeline falhar.
+- **Deploy to Stage**: só roda se os dois jobs anteriores forem bem-sucedidos.
+	Este passo cria um artefato e faz upload para o Environment `stage`. Substitua
+	por uma action de deploy real (SCP, rsync, S3, etc.) conforme sua necessidade.
 
 Este repositório usa o recurso **Environment** do GitHub para o estágio `stage`.
 Isso significa que não é necessário um servidor externo — o job de deploy
