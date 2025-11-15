@@ -21,14 +21,14 @@ jobs:
 
       # Inicializa o CodeQL para a linguagem Python
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           # Indica as linguagens a analisar; aqui usamos Python
           languages: python
 
       # Executa a análise do CodeQL
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         with:
           # Se o CodeQL encontrar problemas de severidade >= medium,
           # a step (e por consequência o job) falhará.
