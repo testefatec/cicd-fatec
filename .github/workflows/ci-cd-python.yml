@@ -74,6 +74,11 @@ jobs:
     name: Deploy to Stage
     runs-on: ubuntu-latest
     needs: [security, test]
+    # Declaramos que este job é um deploy para o Environment `stage` do GitHub.
+    # O uso de `environment: stage` faz com que o GitHub aplique proteções
+    # (ex.: exigência de aprovações) e permita armazenar secrets específicos
+    # para esse environment. Não é necessário um servidor externo para usar isso.
+    environment: stage
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -82,20 +87,14 @@ jobs:
         run: |
           mkdir -p build
           echo "artifact from $GITHUB_SHA" > build/artifact.txt
-
-      # Deploy real via SCP usando appleboy/scp-action.
-      # Condição: só executa se o secret STAGE_HOST estiver configurado.
-      - name: Deploy to stage (SCP)
-        if: ${{ secrets.STAGE_HOST != '' }}
-        uses: appleboy/scp-action@v0.1.8
+      - name: Upload artifact to workflow (stage)
+        uses: actions/upload-artifact@v4
         with:
-          host: ${{ secrets.STAGE_HOST }}
-          username: ${{ secrets.STAGE_USER }}
-          key: ${{ secrets.STAGE_KEY }}
-          port: 22
-          source: "build/*"
-          target: ${{ secrets.STAGE_TARGET }}
+          name: build-artifact
+          path: build/
 
-      - name: Skip deploy message
-        if: ${{ secrets.STAGE_HOST == '' }}
-        run: echo "Nenhum secret STAGE_HOST configurado. Pulando o deploy real."
+      - name: Mark deploy complete (environment)
+        id: done
+        run: |
+          echo "Deployed artifact to GitHub Environment 'stage' (artifact uploaded)."
+          echo "web_url=https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" >> $GITHUB_OUTPUT

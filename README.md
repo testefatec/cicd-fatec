@@ -24,6 +24,8 @@ fornecer um pipeline curto, comentado e fácil de entender para uso em sala de a
 - `STAGE_USER`: usuário SSH
 - `STAGE_KEY`: chave privada SSH (considere usar GitHub Encrypted Secrets)
  - `STAGE_TARGET`: diretório remoto onde os arquivos serão copiados (ex.: `/var/www/stage-app/`)
+ - `STAGE_TARGET`: diretório remoto onde os arquivos seriam copiados (apenas se
+	 usar SCP). NÃO é necessário quando você usa o `Environment` do GitHub.
 
 **Onde editar a regra de falha do CodeQL**:
 - No arquivo `/.github/workflows/ci-cd-python.yml`, a opção `fail-on` está
@@ -58,16 +60,23 @@ flowchart TD
 	instruções. Substitua por uma action de deploy real (SCP, rsync, S3, container
 push, etc.) e use secrets para credenciais.
 
-No exemplo implementado neste repositório, o passo de deploy usa a action
-`appleboy/scp-action` para copiar o conteúdo de `build/` para o servidor de
-stage via SCP. Os secrets necessários são listados acima (`STAGE_HOST`,
-`STAGE_USER`, `STAGE_KEY`, `STAGE_TARGET`).
+Este repositório usa o recurso **Environment** do GitHub para o estágio `stage`.
+Isso significa que não é necessário um servidor externo — o job de deploy
+associa a execução ao Environment `stage` e faz o upload do artefato como
+evidência do deploy.
 
-Como adicionar os secrets no GitHub:
+Como criar o Environment `stage` no GitHub e adicionar secrets específicos:
 1. No GitHub, abra `Settings` do repositório.
-2. Vá em `Secrets and variables` → `Actions` → `New repository secret`.
-3. Adicione `STAGE_HOST`, `STAGE_USER`, `STAGE_KEY` (conteúdo da chave privada
-   em formato PEM) e `STAGE_TARGET`.
+2. Vá em `Environments` → `New environment` e crie o environment com nome
+	`stage`.
+3. Dentro do Environment `stage`, adicione *Environment secrets* se desejar
+	(ex.: variáveis de configuração para o ambiente). Esses secrets ficam
+	restritos ao environment e podem exigir aprovações antes de permitir o
+	deploy.
+
+Se você quiser que o deploy copie arquivos para um servidor real, ainda é
+possível: ajuste a workflow para usar SCP/rsync/S3 e mantenha os secrets no
+Environment (ou em repository secrets), conforme sua preferência.
 
 
 **Notas didáticas / Boas práticas**:
