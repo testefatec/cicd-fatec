@@ -1,0 +1,101 @@
+# CI/CD pipeline curta para Python com CodeQL (GitHub Advanced Security)
+# Esta workflow é propositalmente curta e comentada para uso em sala de aula.
+# Objetivo: executar análise CodeQL antes do deploy para environment `stage`.
+name: CI/CD Python with CodeQL
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # 1) Security: roda o CodeQL para analisar vulnerabilidades.
+  security:
+    name: Security scan (CodeQL)
+    runs-on: ubuntu-latest
+    steps:
+      # Baixa o código da PR/commit
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Inicializa o CodeQL para a linguagem Python
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          # Indica as linguagens a analisar; aqui usamos Python
+          languages: python
+
+      # Executa a análise do CodeQL
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          # Se o CodeQL encontrar problemas de severidade >= medium,
+          # a step (e por consequência o job) falhará.
+          # Troque para 'high' se quiser apenas falhar em issues críticas.
+          fail-on: medium
+
+  # 2) Testes e lint: roda lint (flake8) e testes (pytest).
+  # Este job pode rodar em paralelo ao security, mas mantemos separado
+  # para clareza didática. Ele não tem dependência com 'security'.
+  test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies (if exists)
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Install dev tools (flake8, pytest)
+        run: pip install flake8 pytest || true
+
+      - name: Run flake8 (lint)
+        run: flake8 .
+
+      - name: Run pytest (unit tests)
+        run: pytest -q
+
+  # 3) Deploy to stage: só roda se 'security' e 'test' terminarem com sucesso.
+  # Exemplo simples: cria um artefato e mostra como um deploy real poderia ser feito
+  # usando secrets (STAGE_HOST, STAGE_USER, STAGE_KEY). A etapa de deploy aqui
+  # é educativa — substitua pelo procedimento real da sua infra (SSH, SCP, S3, etc.).
+  deploy-stage:
+    name: Deploy to Stage
+    runs-on: ubuntu-latest
+    needs: [security, test]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build artifact (exemplo)
+        run: |
+          mkdir -p build
+          echo "artifact from $GITHUB_SHA" > build/artifact.txt
+
+      # Deploy real via SCP usando appleboy/scp-action.
+      # Condição: só executa se o secret STAGE_HOST estiver configurado.
+      - name: Deploy to stage (SCP)
+        if: ${{ secrets.STAGE_HOST != '' }}
+        uses: appleboy/scp-action@v0.1.8
+        with:
+          host: ${{ secrets.STAGE_HOST }}
+          username: ${{ secrets.STAGE_USER }}
+          key: ${{ secrets.STAGE_KEY }}
+          port: 22
+          source: "build/*"
+          target: ${{ secrets.STAGE_TARGET }}
+
+      - name: Skip deploy message
+        if: ${{ secrets.STAGE_HOST == '' }}
+        run: echo "Nenhum secret STAGE_HOST configurado. Pulando o deploy real."

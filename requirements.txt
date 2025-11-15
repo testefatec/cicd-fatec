@@ -1,0 +1,3 @@
+# Dependências mínimas para os exercícios em sala de aula
+pytest
+flake8
