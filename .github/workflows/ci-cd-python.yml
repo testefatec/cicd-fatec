@@ -29,11 +29,16 @@ jobs:
         uses: actions/checkout@v4
 
       # Inicializa o CodeQL para a linguagem Python
+      # IMPORTANTE: O arquivo `.github/codeql-config.yml` desabilita o default setup
+      # do GitHub e usa exclusivamente esta workflow customizada.
+      # Isso evita conflitos entre análises automáticas e customizadas.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
         with:
           # Indica as linguagens a analisar; aqui usamos Python
           languages: python
+          # Usa a configuração customizada em codeql-config.yml
+          config-file: .github/codeql-config.yml
 
       # Executa a análise do CodeQL
       # Nota: A ação `analyze@v3` não suporta `fail-on` diretamente.
