@@ -32,20 +32,7 @@ fornecer um pipeline curto, comentado e fácil de entender para uso em sala de a
 	configurada como `medium`. Para falhar apenas em issues críticas, troque para
 	`high`.
 
-**Diagrama da arquitetura da pipeline**:
-
-```mermaid
-flowchart TD
-	PR_PUSH[Push / Pull Request (main)] -->|dispara| Security[CodeQL<br/>(security scan)]
-	PR_PUSH --> Test[Lint + Tests]
-	Security -->|se OK| Deploy[Deploy to Stage]
-	Test -->|se OK| Deploy
-	Security -->|se falhar| Alert[Alerta de Vulnerabilidade]
-	style Security fill:#ffe680,stroke:#333,stroke-width:1px
-	style Test fill:#e6f7ff,stroke:#333,stroke-width:1px
-	style Deploy fill:#e6ffe6,stroke:#333,stroke-width:1px
-	style Alert fill:#ffd6d6,stroke:#900,stroke-width:1px
-```
+**Diagrama da arquitetura da pipeline**: (removido a pedido do professor)
 
 **Explicação dos estágios (didático)**:
 - **Security (CodeQL)**: utiliza a Action oficial `github/codeql-action` para

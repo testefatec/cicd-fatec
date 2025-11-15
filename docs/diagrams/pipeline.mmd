@@ -1,0 +1,21 @@
+%% Diagrama Mermaid da pipeline CI/CD
+%% Arquivo gerado para referência futura (professor pode incluir em slides/README)
+flowchart TD
+  PR_PUSH[Push / Pull Request (main)] --> Security[CodeQL<br/>(security scan)]
+  PR_PUSH --> Test[Lint + Tests]
+
+  Security -- "pass" --> BOTH_OK{Ambos jobs\nconcluídos com sucesso?}
+  Test -- "pass" --> BOTH_OK
+
+  Security -- "falha" --> ALERT[Alerta de Vulnerabilidade / Pipeline falha]
+  Test -- "falha" --> FAIL_TESTS[Erro em lint/tests / Pipeline falha]
+
+  BOTH_OK --> Deploy[Deploy para Environment `stage`]
+  Deploy --> Upload[Upload do artefato (actions/upload-artifact)]
+  Deploy --> ENV[Environment: `stage`\n(approvals & secrets opcionais)]
+
+  style Security fill:#fff2b3,stroke:#333,stroke-width:1px
+  style Test fill:#dff3ff,stroke:#333,stroke-width:1px
+  style Deploy fill:#e6ffe6,stroke:#333,stroke-width:1px
+  style ALERT fill:#ffd6d6,stroke:#900,stroke-width:1px
+  style FAIL_TESTS fill:#ffd6d6,stroke:#900,stroke-width:1px
