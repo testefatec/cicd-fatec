@@ -7,6 +7,7 @@ Objetivo: demonstrar vulnerabilidades simples que o CodeQL deve detectar
  (ex.: uso de `eval` com entrada do usuário)...
 """
 
+
 def insecure_eval(user_input: str):
     """Avalia uma expressão a partir de uma string fornecida pelo usuário.
 
