@@ -9,11 +9,19 @@ import sqlite3
 
 
 def build_query(usuario: str) -> str:
-    """Constrói uma query SQL de forma insegura (SQL Injection).
+    """Constrói queries SQL de forma insegura (SQL Injection).
 
-    Vulnerabilidade: interpolação direta de entrada não confiável na query.
+    Retorna três variantes inseguras para aumentar cobertura de detecção:
+    1. f-string
+    2. concatenação simples
+    3. format()
+    Qualquer uma delas permite injeção se `usuario` contiver payload malicioso.
     """
-    return f"SELECT * FROM users WHERE username = '{usuario}'"
+    q1 = f"SELECT * FROM users WHERE username = '{usuario}'"
+    q2 = "SELECT * FROM users WHERE username = '" + usuario + "'"
+    q3 = "SELECT * FROM users WHERE username = '{}'".format(usuario)
+    # Retornamos a primeira apenas para uso didático, mas as outras são executadas no fluxo.
+    return q1, q2, q3
 
 
 def busca_usuario() -> None:
@@ -27,11 +35,13 @@ def busca_usuario() -> None:
         "INSERT INTO users (username, password) VALUES ('admin', 'admin123')"
     )
     usuario = input("Digite o nome de usuário: ")
-    # Vulnerabilidade: SQL Injection
-    query = build_query(usuario)
-    print(f"Executando: {query}")
-    cur.execute(query)
-    print(cur.fetchall())
+    # Vulnerabilidade: SQL Injection (três padrões diferentes)
+    q1, q2, q3 = build_query(usuario)
+
+    for idx, q in enumerate([q1, q2, q3], start=1):
+        print(f"[{idx}] Executando inseguramente: {q}")
+        cur.execute(q)
+        print(cur.fetchall())
 
 
 if __name__ == "__main__":
