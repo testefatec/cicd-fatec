@@ -19,11 +19,11 @@ def insecure_sql_injection():
     conn = sqlite3.connect(":memory:")
     cur = conn.cursor()
     cur.execute(
-        "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)"
-    )
+            "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)"
+        )
     cur.execute(
-        "INSERT INTO users (username, password) VALUES ('admin', 'admin123')"
-    )
+            "INSERT INTO users (username, password) VALUES ('admin', 'admin123')"
+        )
     user = input("Digite o nome de usuário: ")
     # Vulnerável: interpolação direta
     query = f"SELECT * FROM users WHERE username = '{user}'"
