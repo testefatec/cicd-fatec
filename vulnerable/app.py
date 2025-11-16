@@ -11,7 +11,7 @@ import sqlite3
 def busca_usuario():
     conn = sqlite3.connect(":memory:")
     cur = conn.cursor()
-    cur.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, user TEXT, passw TEXT)")
+    cur.execute("CREATE TABLE users (user TEXT, passw TEXT)")
     cur.execute("INSERT INTO users (user, passw) VALUES ('admin', 'admin123')")
     usuario = input("Digite o nome de usuário: ")
     # Vulnerabilidade: SQL Injection
