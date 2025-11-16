@@ -1,11 +1,10 @@
 """
 Exemplo didático de vulnerabilidade OWASP Top 10 para CodeQL.
 
-Este código contém apenas uma vulnerabilidade clássica de SQL Injection.
+Este código contém apenas uma vulnerabilidade clássica de SQL In.
 O objetivo é que o CodeQL detecte e a pipeline bloqueie o deploy para o
 environment stage.
 """
-
 import sqlite3
 
 
