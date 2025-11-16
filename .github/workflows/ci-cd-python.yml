@@ -83,6 +83,8 @@ jobs:
         run: flake8 .
 
       - name: Run pytest (unit tests)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: pytest -q
 
   # 3) Deploy to stage: só roda se 'security' e 'test' terminarem com sucesso.
