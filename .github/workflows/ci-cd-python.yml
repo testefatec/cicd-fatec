@@ -48,7 +48,7 @@ jobs:
           wait-for-processing: true
 
       # Falha o job se existirem alertas CodeQL abertos com severidade >= medium
-      - name: Fail on CodeQL alerts (>= medium)
+      - name: Fail on CodeQL alerts (any severity)
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,11 +62,9 @@ jobs:
               { owner, repo, ref, per_page }
             );
             const alerts = all.filter(a => a.tool?.name === 'CodeQL' && a.state === 'open');
-            const sev = a => (a.rule?.security_severity_level || '').toLowerCase();
-            const bad = alerts.filter(a => ['medium','high','critical'].includes(sev(a)));
-            core.info(`CodeQL alerts (open): total=${alerts.length}, medium+=${bad.length}`);
-            if (bad.length > 0) {
-              core.setFailed(`CodeQL encontrou ${bad.length} alerta(s) >= medium. Deploy bloqueado.`);
+            core.info(`CodeQL alerts (open): total=${alerts.length}`);
+            if (alerts.length > 0) {
+              core.setFailed(`CodeQL encontrou ${alerts.length} alerta(s). Deploy bloqueado.`);
             }
 
   # 2) Testes e lint: roda lint (flake8) e testes (pytest).

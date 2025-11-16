@@ -4,7 +4,7 @@ Exemplos intencionalmente vulneráveis para fins didáticos.
 AVISO: Este código é inseguro por design. Não use em produção.
 
 Objetivo: demonstrar vulnerabilidades simples que o CodeQL deve detectar
- (ex.: uso de `eval` com entrada do usuário)....
+ (ex.: uso de `eval` com entrada do usuário e command injection).
 """
 
 
@@ -28,3 +28,26 @@ def safe_eval_example(user_input: str):
     if any(c not in allowed_chars for c in user_input):
         raise ValueError("Entrada contém caracteres não permitidos")
     return eval(user_input)
+
+
+def insecure_eval_from_input():
+    """Exemplo ainda mais perigoso: lê entrada do usuário e avalia diretamente.
+
+    Este fluxo deve ser detectado como potencialmente explorável pois a origem é
+    `input()` (não confiável) e o destino é `eval()` (código dinâmico).
+    """
+    expr = input("Digite uma expressão: ")
+    return eval(expr)
+
+
+def insecure_command_from_input():
+    """Command injection: executa comando fornecido pelo usuário com shell=True.
+
+    Exemplo didático para demonstrar como entradas não confiáveis podem levar a
+    execução de comandos arbitrários no sistema operacional.
+    """
+    import subprocess
+
+    cmd = input("Digite um comando: ")
+    # shell=True com entrada não sanitizada é perigoso
+    subprocess.run(cmd, shell=True)
