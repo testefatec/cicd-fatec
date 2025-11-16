@@ -76,7 +76,7 @@ jobs:
     needs: [security]
     # Declaramos que este job é um deploy para o Environment `stage` do GitHub.
     # O uso de `environment: stage` faz com que o GitHub aplique proteções
-    # (ex.: exigência de aprovações) e permita armazenar secrets específicos
+    # (ex.: exigência de aprovações) e permita armazenar. secrets específicos
     # para esse environment. Não é necessário um servidor externo para usar isso.
     environment: stage
     steps:
