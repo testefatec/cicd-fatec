@@ -33,7 +33,7 @@ jobs:
       # do GitHub e usa exclusivamente esta workflow customizada.
       # Isso evita conflitos entre análises automáticas e customizadas.
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
+        uses: github/codeql-action/init@v4
         with:
           # Indica as linguagens a analisar; aqui usamos Python
           languages: python
@@ -41,11 +41,11 @@ jobs:
           config-file: .github/codeql-config.yml
 
       # Executa a análise do CodeQL
-      # Nota: A ação `analyze@v3` não suporta `fail-on` diretamente.
+      # Nota: A ação `analyze@v4` não suporta `fail-on` diretamente.
       # As vulnerabilidades são reportadas em "Security" → "Code scanning alerts".
       # Você pode criar uma rule no GitHub para bloquear merges se houver alertas críticos.
       - name: Perform CodeQL analysis
-        uses: github/codeql-action/analyze@v3
+        uses: github/codeql-action/analyze@v4
         with:
           # Opções disponíveis em v3:
           # - checkout_path: caminho do repositório
