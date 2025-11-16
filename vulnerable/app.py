@@ -30,6 +30,7 @@ def insecure_sql_injection():
     print(f"Executando: {query}")
     cur.execute(query)
     print(cur.fetchall())
+
 """
 Exemplos intencionalmente vulneráveis para fins didáticos.
 
@@ -63,6 +64,7 @@ def safe_eval_example(user_input: str):
     return eval(user_input)
 
 
+
 def insecure_eval_from_input():
     """Exemplo ainda mais perigoso: lê entrada do usuário e avalia diretamente.
 
@@ -88,6 +90,7 @@ def insecure_command_from_input():
     subprocess.run(cmd, shell=True)
 
 
+
 def insecure_yaml_load():
     """Deserialização YAML insegura usando yaml.load sem SafeLoader.
 
@@ -101,6 +104,7 @@ def insecure_yaml_load():
     return yaml.load(data)
 
 
+
 def insecure_pickle_load():
     """Deserialização de entrada não confiável com pickle.loads.
 
@@ -112,3 +116,4 @@ def insecure_pickle_load():
     blob = input("Digite dados pickle (string): ")
     # Inseguro: desserializa entrada não confiável
     return pickle.loads(blob)  # type: ignore[arg-type]
+
