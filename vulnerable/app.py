@@ -23,7 +23,8 @@ def safe_eval_example(user_input: str):
 
     Implementado apenas para comparação com a função insegura.
     """
-    # Implementação simples e limitada — não execute em produção sem revisão.
+    # Implementação simples e limitada — não execute em produção
+    # sem revisão.
     allowed_chars = "0123456789+-*/(). "
     if any(c not in allowed_chars for c in user_input):
         raise ValueError("Entrada contém caracteres não permitidos")
