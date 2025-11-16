@@ -16,7 +16,7 @@ def build_command(user_input: str) -> str:
 def run_insecure_command() -> None:
     cmd = input("Digite um comando para executar: ")
     full = build_command(cmd)
-    # Vuln: comm injection (ent. não confiável em shell=True e os.system)
+    # Vuln: comm injection (ent não confiável em shell=True e os.system)
     print(f"Executando inseguramente: {full}")
     os.system(full)
     subprocess.run(full, shell=True)
