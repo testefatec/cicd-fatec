@@ -1,3 +1,13 @@
+"""
+Exemplos intencionalmente vulneráveis para fins didáticos.
+
+AVISO: Este código é inseguro por design. Não use em produção.
+
+Objetivo: demonstrar vulnerabilidades simples que o CodeQL deve detectar
+ (ex.: uso de `eval` com entrada do usuário e command injection).
+"""
+
+
 def insecure_sql_injection():
     """Exemplo de SQL Injection (OWASP Top 10) usando sqlite3.
 
@@ -8,8 +18,12 @@ def insecure_sql_injection():
     import sqlite3
     conn = sqlite3.connect(":memory:")
     cur = conn.cursor()
-    cur.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)")
-    cur.execute("INSERT INTO users (username, password) VALUES ('admin', 'admin123')")
+    cur.execute(
+        "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)"
+    )
+    cur.execute(
+        "INSERT INTO users (username, password) VALUES ('admin', 'admin123')"
+    )
     user = input("Digite o nome de usuário: ")
     # Vulnerável: interpolação direta
     query = f"SELECT * FROM users WHERE username = '{user}'"
