@@ -1,27 +1,28 @@
-"""
-Exemplo didático de vulnerabilidade OWASP Top 10 para CodeQL.
+"""Exemplo didático de vulnerabilidade OWASP Top 10 (SQL Injection).
 
-Este código contém apenas uma vulnerabilidade clássica de SQL In.
-O objetivo é que o CodeQL detecte e a pipeline bloqueie o deploy para o
-environment stage.
+Objetivo: fornecer múltiplos padrões inseguros de construção de query para
+facilitar a detecção por CodeQL e bloquear o deploy na pipeline.
 """
 import sqlite3
 
 
-def build_query(usuario: str) -> str:
-    """Constrói queries SQL de forma insegura (SQL Injection).
+def build_query(usuario: str) -> tuple[str, str, str, str, str]:
+        """Constrói múltiplas variantes inseguras de consulta.
 
-    Retorna três variantes inseguras para aumentar cobertura de detecção:
-    1. f-string
-    2. concatenação simples
-    3. format()
-    Qualquer uma delas permite injeção se `usuario` contiver payload malicioso.
-    """
-    q1 = f"SELECT * FROM users WHERE username = '{usuario}'"
-    q2 = "SELECT * FROM users WHERE username = '" + usuario + "'"
-    q3 = "SELECT * FROM users WHERE username = '{}'".format(usuario)
-    # Retornamos a primeira apenas para uso didático, mas as outras são executadas no fluxo.
-    return q1, q2, q3
+        Variantes retornadas:
+            1. f-string
+            2. concatenação com +
+            3. format()
+            4. old-style % formatting
+            5. join() sobre lista
+        Todas interpolam diretamente a entrada não confiável.
+        """
+        q1 = f"SELECT * FROM users WHERE username = '{usuario}'"
+        q2 = "SELECT * FROM users WHERE username = '" + usuario + "'"
+        q3 = "SELECT * FROM users WHERE username = '{}'".format(usuario)
+        q4 = "SELECT * FROM users WHERE username = '%s'" % usuario
+        q5 = "".join(["SELECT * FROM users WHERE username = '", usuario, "'"])
+        return q1, q2, q3, q4, q5
 
 
 def busca_usuario() -> None:
@@ -35,16 +36,14 @@ def busca_usuario() -> None:
         "INSERT INTO users (username, password) VALUES ('admin', 'admin123')"
     )
     usuario = input("Digite o nome de usuário: ")
-    # Vulnerabilidade: SQL Injection (três padrões diferentes)
-    q1, q2, q3 = build_query(usuario)
+    # Vulnerabilidade: SQL Injection (cinco padrões diferentes)
+    q1, q2, q3, q4, q5 = build_query(usuario)
 
-    for idx, q in enumerate([q1, q2, q3], start=1):
+    for idx, q in enumerate([q1, q2, q3, q4, q5], start=1):
         print(f"[{idx}] Executando inseguramente: {q}")
         cur.execute(q)
         print(cur.fetchall())
 
 
-if __name__ == "__main__":
-    busca_usuario()
 if __name__ == "__main__":
     busca_usuario()
