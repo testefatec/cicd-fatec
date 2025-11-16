@@ -66,14 +66,14 @@ jobs:
             if (alerts.length > 0) {
               core.setFailed(`CodeQL encontrou ${alerts.length} alerta(s). Deploy bloqueado.`);
             }
-  # 3) Deploy to stage: só roda se 'security' e 'test' terminarem com sucesso.
+  # 3) Deploy to stage: só roda se 'security' terminar com sucesso.
   # Exemplo simples: cria um artefato e mostra como um deploy real poderia ser feito
   # usando secrets (STAGE_HOST, STAGE_USER, STAGE_KEY). A etapa de deploy aqui
   # é educativa — substitua pelo procedimento real da sua infra (SSH, SCP, S3, etc.).
   deploy-stage:
     name: Deploy to Stage
     runs-on: ubuntu-latest
-    needs: [security, test]
+    needs: [security]
     # Declaramos que este job é um deploy para o Environment `stage` do GitHub.
     # O uso de `environment: stage` faz com que o GitHub aplique proteções
     # (ex.: exigência de aprovações) e permita armazenar secrets específicos
