@@ -1,12 +1,7 @@
-# Configuração do CodeQL para Python
-# Este arquivo desabilita o default setup automático e usa apenas a workflow customizada.
+# Configuração do CodeQL para Python (apenas workflow customizada)
+# Expande o conjunto de queries para aumentar a cobertura de alertas.
 
-version: 1.0
-
-# Desabilita o default setup do GitHub para evitar conflito com a workflow customizada
-run:
-  # Python é o único pdbg analisado neste repositório
-  enabled: true
-
+name: codeql-config
 queries:
+  - uses: security-extended
   - uses: security-and-quality

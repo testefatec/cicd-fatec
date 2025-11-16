@@ -54,3 +54,29 @@ def insecure_command_from_input():
     cmd = input("Digite um comando: ")
     # shell=True com entrada não sanitizada é perigoso
     subprocess.run(cmd, shell=True)
+
+
+def insecure_yaml_load():
+    """Deserialização YAML insegura usando yaml.load sem SafeLoader.
+
+    Leitura de dados YAML não confiáveis pode executar objetos arbitrários
+    dependendo do Loader. Use yaml.safe_load em produção.
+    """
+    import yaml
+
+    data = input("Digite YAML: ")
+    # Uso inseguro: yaml.load sem especificar SafeLoader
+    return yaml.load(data)
+
+
+def insecure_pickle_load():
+    """Deserialização de entrada não confiável com pickle.loads.
+
+    Deserializar dados fornecidos por usuário permite execução de código
+    arbitrário. Não use pickle com dados não confiáveis.
+    """
+    import pickle
+
+    blob = input("Digite dados pickle (string): ")
+    # Inseguro: desserializa entrada não confiável
+    return pickle.loads(blob)  # type: ignore[arg-type]
