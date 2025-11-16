@@ -1,3 +1,21 @@
+def insecure_sql_injection():
+    """Exemplo de SQL Injection (OWASP Top 10) usando sqlite3.
+
+    Entrada do usuário é interpolada diretamente na query SQL,
+    permitindo manipulação da consulta e acesso/alteração de dados.
+    CodeQL deve detectar este padrão como vulnerabilidade.
+    """
+    import sqlite3
+    conn = sqlite3.connect(":memory:")
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)")
+    cur.execute("INSERT INTO users (username, password) VALUES ('admin', 'admin123')")
+    user = input("Digite o nome de usuário: ")
+    # Vulnerável: interpolação direta
+    query = f"SELECT * FROM users WHERE username = '{user}'"
+    print(f"Executando: {query}")
+    cur.execute(query)
+    print(cur.fetchall())
 """
 Exemplos intencionalmente vulneráveis para fins didáticos.
 
