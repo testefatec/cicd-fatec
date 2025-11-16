@@ -33,8 +33,9 @@ def safe_eval_example(user_input: str):
 def insecure_eval_from_input():
     """Exemplo ainda mais perigoso: lê entrada do usuário e avalia diretamente.
 
-    Este fluxo deve ser detectado como potencialmente explorável pois a origem é
-    `input()` (não confiável) e o destino é `eval()` (código dinâmico).
+    Este fluxo deve ser detectado como potencialmente explorável
+    pois a origem é `input()` (não confiável) e o destino é
+    `eval()` (código dinâmico).
     """
     expr = input("Digite uma expressão: ")
     return eval(expr)
@@ -43,8 +44,9 @@ def insecure_eval_from_input():
 def insecure_command_from_input():
     """Command injection: executa comando fornecido pelo usuário com shell=True.
 
-    Exemplo didático para demonstrar como entradas não confiáveis podem levar a
-    execução de comandos arbitrários no sistema operacional.
+    Exemplo didático para demonstrar como entradas não confiáveis
+    podem levar à execução de comandos arbitrários no sistema
+    operacional.
     """
     import subprocess
 
