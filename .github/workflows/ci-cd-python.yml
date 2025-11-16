@@ -66,14 +66,46 @@ jobs:
             if (alerts.length > 0) {
               core.setFailed(`CodeQL encontrou ${alerts.length} alerta(s). Deploy bloqueado.`);
             }
-  # 3) Deploy to stage: só roda se 'security' terminar com sucesso.
+
+  # 2) Testes e lint: roda lint (flake8) e testes (pytest).
+  test:
+    name: Lint and Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install dependencies (if exists)
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Install dev tools (flake8, pytest)
+        run: pip install flake8 pytest || true
+
+      - name: Run flake8 (lint)
+        run: flake8 . || true
+
+      - name: Run pytest (unit tests)
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: pytest -q
+
+  # 3) Deploy to stage: só roda se 'security' e 'test' terminarem com sucesso.
   # Exemplo simples: cria um artefato e mostra como um deploy real poderia ser feito
   # usando secrets (STAGE_HOST, STAGE_USER, STAGE_KEY). A etapa de deploy aqui
   # é educativa — substitua pelo procedimento real da sua infra (SSH, SCP, S3, etc.).
   deploy-stage:
     name: Deploy to Stage
     runs-on: ubuntu-latest
-    needs: [security]
+    needs: [security, test]
     # Declaramos que este job é um deploy para o Environment `stage` do GitHub.
     # O uso de `environment: stage` faz com que o GitHub aplique proteções
     # (ex.: exigência de aprovações) e permita armazenar. secrets específicos
